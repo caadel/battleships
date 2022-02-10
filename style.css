@@ -1,0 +1,79 @@
+:root {
+  --dark-bg: hsl(0, 0%, 7%);
+  --board-bg: hsl(0, 0%, 85%);
+  --board-bg-disabled: hsl(0, 0%, 50%);
+  --cross-light-color: hsl(0, 0%, 38%);
+  --cross-hit-color: hsl(0, 100%, 40%);
+  --cross-miss-color: hsl(251, 61%, 24%);
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  background-color: var(--dark-bg);
+}
+
+.game-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(10, 2rem);
+  grid-template-rows: repeat(10, 2rem);
+  background-color: var(--board-bg);
+  border: 1px solid black;
+}
+
+.board.disabled {
+  pointer-events: none;
+  background-color: var(--board-bg-disabled);
+}
+
+.board div {
+  border: 1px solid black;
+  position: relative;
+  cursor: pointer;
+}
+
+.board .hit,
+.board .miss {
+  pointer-events: none;
+}
+
+.board .hit::before,
+.board .hit::after {
+  background-color: var(--cross-hit-color);
+}
+
+.board .miss::before,
+.board .miss::after {
+  background-color: var(--cross-miss-color);
+}
+
+.board div::before,
+.board div::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.125rem;
+  height: 80%;
+}
+.board div:hover::before,
+.board div:hover::after {
+  background-color: var(--cross-light-color);
+}
+.board div::before {
+  transform: translate(-50%, -50%) rotateZ(45deg);
+}
+.board div::after {
+  transform: translate(-50%, -50%) rotateZ(-45deg);
+}
