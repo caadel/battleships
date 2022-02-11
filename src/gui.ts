@@ -55,7 +55,7 @@ function init() {
   const instructionTitle = createElement('h2', 'info-display')
   instructionTitle.innerText = 'Instructions'
   const instructions1 = createElement('div', 'info-display', 'instructions')
-  instructions1.innerHTML = `<strong>When placing:</strong> click to place ship, right-click to rotate ship`
+  instructions1.innerHTML = `<strong>When placing:</strong> right-click to rotate the ship, click to place it`
   const instructions2 = createElement('div', 'info-display', 'instructions')
   instructions2.innerHTML = `<strong>During firing:</strong> click to fire!`
   document.body.append(instructionTitle, instructions1, instructions2)
@@ -81,24 +81,21 @@ function updatePlayerDisplay(id: number) {
   currentPlayerDisplay.innerText = `Player ${id}'s turn`
 }
 
-function markCellAsShip(cell: Element) {
-  cell.classList.add('placement')
+/**
+ * Marks a cell. Valid states are "hit", "miss", and "placed"
+ * @param cell Cell to update.
+ * @param state State to add to the cell.
+ */
+function markCell(cell: Element, state: string) {
+  cell.classList.add(state)
 }
 
-function markCellAsMiss(cell: Element) {
-  cell.classList.add('hit')
-}
-
-function markCellAsHit(cell: Element) {
-  cell.classList.add('hit')
-}
-
+/**
+ * Removes the "placed" state from a given cell.
+ * @param cell Cell to update.
+ */
 function clearCell(cell: Element) {
-  cell.classList.remove('placement')
-}
-
-function placeShipOnBoard(board: Element, x: number, y: number) {
-  board.children[x * y].classList.add('placement')
+  cell.classList.remove('placed')
 }
 
 /**
@@ -127,6 +124,7 @@ function showPlayerBoard(isSetupPhase: boolean, isFirstPlayer: boolean) {
     boardToHide = interactables.player1SetupBoard
     boardToShow = interactables.player2SetupBoard
 
+    // Hide player 1's board when player 2 is placing
     for (const cell of interactables.player1SetupBoard.children) {
       clearCell(cell)
     }
@@ -134,6 +132,18 @@ function showPlayerBoard(isSetupPhase: boolean, isFirstPlayer: boolean) {
 
   boardToHide.classList.add('disabled')
   boardToShow.classList.remove('disabled')
+}
+
+/**
+ * Disables the game boards and shows the winner.
+ * @param winner ID of the winning player.
+ */
+function showGameOver(winner: number) {
+  interactables.player1Board.classList.add('disabled')
+  interactables.player2Board.classList.add('disabled')
+
+  updatePlayerDisplay(winner)
+  updateInfoDisplay('Is the winner!')
 }
 
 /**
@@ -175,10 +185,8 @@ export default {
   showPlayerBoard,
   updateInfoDisplay,
   updatePlayerDisplay,
-  markCellAsShip,
-  markCellAsHit,
-  markCellAsMiss,
+  markCell,
   clearCell,
-  placeShipOnBoard,
   hideSetupArea,
+  showGameOver,
 }
