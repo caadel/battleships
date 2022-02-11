@@ -4,7 +4,17 @@
  * from the caller (i.e. the controller).
  *
  * gui.ts, style.css, and index.html essentially makes up the "View" in MVC.
+ *
+ * All HTML elements seen in the app are made from code in this file.
  */
+
+// Private variables
+const currentPlayerDisplay = document.body.appendChild(
+  createElement('h1', 'info-display')
+)
+const infoDisplay = document.body.appendChild(
+  createElement('h3', 'info-display')
+)
 
 /**
  * These elements can be read by the controller after calling init(),
@@ -16,12 +26,6 @@ const interactables = {
   player2Board: HTMLElement.prototype,
   player2SetupBoard: HTMLElement.prototype,
 }
-const currentPlayerDisplay = document.body.appendChild(
-  createElement('h1', 'info-display')
-)
-const infoDisplay = document.body.appendChild(
-  createElement('h3', 'info-display')
-)
 
 /**
  * Initialises GUI components.
@@ -51,14 +55,24 @@ function init() {
   populateBoard(interactables.player2Board)
   populateBoard(interactables.player2SetupBoard)
 
-  // Add some written instructions
+  // Add some written instructions to the screen
   const instructionTitle = createElement('h2', 'info-display')
   instructionTitle.innerText = 'Instructions'
   const instructions1 = createElement('div', 'info-display', 'instructions')
   instructions1.innerHTML = `<strong>When placing:</strong> right-click to rotate the ship, click to place it`
   const instructions2 = createElement('div', 'info-display', 'instructions')
   instructions2.innerHTML = `<strong>During firing:</strong> click to fire!`
-  document.body.append(instructionTitle, instructions1, instructions2)
+  const shipsTitle = createElement('h3', 'info-display')
+  shipsTitle.innerText = 'Ship lengths'
+  const shipsInstructions = createElement('div', 'info-display', 'instructions')
+  shipsInstructions.innerHTML = `Carrier: 5, Battleship: 4, Cruiser: 3, Submarine: 3, Destroyer: 2`
+  document.body.append(
+    instructionTitle,
+    instructions1,
+    instructions2,
+    shipsTitle,
+    shipsInstructions
+  )
 
   return {
     interactables,
@@ -82,7 +96,7 @@ function updatePlayerDisplay(id: number) {
 }
 
 /**
- * Marks a cell. Valid states are "hit", "miss", and "placed"
+ * Marks a cell. Valid states are "hit", "miss", and "placed".
  * @param cell Cell to update.
  * @param state State to add to the cell.
  */
@@ -102,14 +116,14 @@ function clearCell(cell: Element) {
  * Shows the game or setup board of the given player.
  * Deactivates the board not in use.
  * @param isSetupPhase True if the setup-boards are to be shown.
- * @param isFirstPlayer True if the first player is to play.
+ * @param playerID The ID of the player (1 or 2).
  */
-function showPlayerBoard(isSetupPhase: boolean, isFirstPlayer: boolean) {
+function showPlayerBoard(isSetupPhase: boolean, playerID: number) {
   // setup = false, first = false
   let boardToHide = interactables.player2Board
   let boardToShow = interactables.player1Board
 
-  if (isFirstPlayer) {
+  if (playerID === 1) {
     if (!isSetupPhase) {
       // setup = false, first = true
       boardToHide = interactables.player1Board
@@ -142,8 +156,8 @@ function showGameOver(winner: number) {
   interactables.player1Board.classList.add('disabled')
   interactables.player2Board.classList.add('disabled')
 
-  updatePlayerDisplay(winner)
-  updateInfoDisplay('Is the winner!')
+  infoDisplay.innerText = 'Congratulations!'
+  currentPlayerDisplay.innerText = `Player ${winner} is the winner!`
 }
 
 /**
