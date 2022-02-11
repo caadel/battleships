@@ -42,8 +42,6 @@ export class Player {
         return this.ships.some((ship) => !ship.hasSunk);
     }
     placeNextShipAt(x, y) {
-        if (this.nextShipToPlace === null)
-            return;
         const isLegalPlacement = this.canPlaceNextShipAt(x, y);
         if (isLegalPlacement) {
             for (let i = 0; i < this.nextShipToPlace.length; i++) {
@@ -65,7 +63,7 @@ export class Player {
         return isLegalPlacement;
     }
     canPlaceNextShipAt(x, y) {
-        if (!this.nextShipToPlace)
+        if (!this.hasShipsLeftToPlace)
             return false;
         for (let i = 0; i < this.nextShipToPlace.length; i++) {
             let xToCheck = x;
@@ -73,7 +71,7 @@ export class Player {
             this.nextShipToPlace.isHorizontal
                 ? (xToCheck = x + i)
                 : (yToCheck = y + i);
-            if (xToCheck === 10 || yToCheck === 10)
+            if (xToCheck >= 10 || yToCheck >= 10)
                 return false;
             if (this.grid[yToCheck][xToCheck]) {
                 return false;

@@ -27,7 +27,7 @@ export class Ship {
    */
   public hit() {
     this.cellsLeft--
-    this.hasSunk = this.cellsLeft === 0
+    this.hasSunk = this.cellsLeft <= 0
     return this.hasSunk
   }
 }

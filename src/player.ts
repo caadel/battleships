@@ -49,7 +49,7 @@ export class Player {
    * coordinates have previously been fired at already.
    * @param x Horizontal position to fire at.
    * @param y Vertical position to fire at.
-   * @returns False if the shot missed, ship name and sate if the shot hit.
+   * @returns False if the shot missed, ship name and state if the shot hit.
    */
   public getsfiredAt(x: number, y: number) {
     const cellToHit = this.grid[y][x]
@@ -77,8 +77,6 @@ export class Player {
    * @returns True if the ship could be placed.
    */
   public placeNextShipAt(x: number, y: number) {
-    if (this.nextShipToPlace === null) return
-
     const isLegalPlacement = this.canPlaceNextShipAt(x, y)
 
     if (isLegalPlacement) {
@@ -109,7 +107,7 @@ export class Player {
    * @returns True if the ship can be placed.
    */
   public canPlaceNextShipAt(x: number, y: number) {
-    if (!this.nextShipToPlace) return false
+    if (!this.hasShipsLeftToPlace) return false
 
     for (let i = 0; i < this.nextShipToPlace.length; i++) {
       let xToCheck = x
@@ -120,7 +118,7 @@ export class Player {
         : (yToCheck = y + i)
 
       // Check potential out of bounds
-      if (xToCheck === 10 || yToCheck === 10) return false
+      if (xToCheck >= 10 || yToCheck >= 10) return false
 
       // Check if the cell is already occupied
       if (this.grid[yToCheck][xToCheck]) {
