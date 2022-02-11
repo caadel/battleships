@@ -35,7 +35,8 @@ class Ship {
 class Player {
   public grid: (null | Ship)[][]
   public ships: Ship[]
-  public nextShipToPlace: null | Ship
+  public nextShipToPlace: Ship
+  public hasShipsLeftToPlace: boolean
   public id: number
 
   constructor(id: number) {
@@ -56,6 +57,7 @@ class Player {
     }
 
     this.nextShipToPlace = this.ships[0]
+    this.hasShipsLeftToPlace = true
   }
 
   /**
@@ -82,11 +84,11 @@ class Player {
    * @returns False if the shot missed, ship name and sate if the shot hit.
    */
   public getsfiredAt(x: number, y: number) {
-    const cellToHit = this.grid[x][y]
+    const cellToHit = this.grid[y][x]
     if (cellToHit === null) {
       return false
     } else {
-      this.grid[x][y] = null
+      this.grid[y][x] = null
       return { name: cellToHit.name, hasSunk: cellToHit.hit() }
     }
   }
@@ -122,10 +124,10 @@ class Player {
       }
 
       const nextShipIndex = this.ships.indexOf(this.nextShipToPlace) + 1
-      if (nextShipIndex === this.ships.length) {
-        this.nextShipToPlace = null
-      } else {
+      if (nextShipIndex !== this.ships.length) {
         this.nextShipToPlace = this.ships[nextShipIndex]
+      } else {
+        this.hasShipsLeftToPlace = false
       }
     }
 
@@ -167,6 +169,7 @@ class Player {
 let players: Player[]
 let currentPlayer: Player
 let gameHasEnded = false
+let placementPhaseActive: boolean
 
 /**
  * Initialises the game by creating two new players.
@@ -176,6 +179,7 @@ function newGame() {
   players = [new Player(1), new Player(2)]
   currentPlayer = players[0]
   gameHasEnded = false
+  placementPhaseActive = true
 }
 newGame()
 
@@ -194,6 +198,7 @@ function takeTurn(x: number, y: number) {
   if (!currentPlayer.hasShipsLeft()) {
     gameHasEnded = true
     // Current player is swapped to become the player who won
+
     swapCurrentPlayer()
   }
 
@@ -216,16 +221,44 @@ function swapCurrentPlayer() {
  * @returns True if the ship could be placed.
  */
 function placeShipAt(x: number, y: number) {
-  // check for legal placement
-  return currentPlayer.placeNextShipAt(x, y)
+  const shipWasPlaced = currentPlayer.placeNextShipAt(x, y)
+
+  if (shipWasPlaced && !currentPlayer.hasShipsLeftToPlace) {
+    swapCurrentPlayer()
+
+    if (players.every((player) => !player.hasShipsLeftToPlace)) {
+      placementPhaseActive = false
+    }
+  }
+
+  return shipWasPlaced
 }
 
 /**
- * Returns the current player.
- * @returns The player.
+ * Checks if a ship can be placed at a given origin.
+ * @param x Horizontal position to place origin at.
+ * @param y Vetical position to palce origin at.
+ * @returns True if the ship can be placed.
+ */
+function canPlaceShipAt(x: number, y: number) {
+  return currentPlayer.canPlaceNextShipAt(x, y)
+}
+/**
+ * Returns the current player's id.
+ * @returns The player's id.
  */
 function getCurrentPlayer() {
-  return currentPlayer
+  return currentPlayer.id
+}
+
+function getNextShipData() {
+  const ship = currentPlayer.nextShipToPlace
+
+  return {
+    name: ship.name,
+    length: ship.length,
+    isHorizontal: ship.isHorizontal,
+  }
 }
 
 /**
@@ -235,11 +268,22 @@ function rotateNextShip() {
   currentPlayer.nextShipToPlace?.changeDirection()
 }
 
+function placementFinished() {
+  return !placementPhaseActive
+}
+
+function hasEnded() {
+  return gameHasEnded
+}
 export default {
+  newGame,
   getCurrentPlayer,
   takeTurn,
   placeShipAt,
-  newGame,
+  canPlaceShipAt,
   rotateNextShip,
-  gameHasEnded,
+  hasEnded,
+  getNextShipData,
+  swapCurrentPlayer,
+  placementFinished,
 }
